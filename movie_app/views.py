@@ -10,28 +10,32 @@ class DirectorListCreateAPIView(generics.ListCreateAPIView):
     queryset = Director.objects.all()
     serializer_class = DirectorSerializer
 
-class DirectorRetrieveAPIView(generics.RetrieveAPIView):
+class DirectorRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Director.objects.all()
     serializer_class = DirectorSerializer
+
 
 class MovieListCreateAPIView(generics.ListCreateAPIView):
     queryset = Movie.objects.all()
     serializer_class = MovieSerializer
 
-class MovieRetrieveAPIView(generics.RetrieveAPIView):
+class MovieRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Movie.objects.all()
     serializer_class = MovieSerializer
+
 
 class ReviewListCreateAPIView(generics.ListCreateAPIView):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
 
-class ReviewRetrieveAPIView(generics.RetrieveAPIView):
+class ReviewRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
+
 
 class MovieReviewsListAPIView(generics.ListAPIView):
     serializer_class = MovieSerializer
 
-    def get_queryset(self):
-        return Movie.objects.all().prefetch_related('review_set')
+def get_queryset(self):
+    return Movie.objects.all().prefetch_related('review_set')
+
