@@ -1,9 +1,20 @@
-from rest_framework.routers import DefaultRouter
-from .views import DirectorViewSet, MovieViewSet, ReviewViewSet
+from django.urls import path
+from .views import (
+    DirectorListCreateAPIView,
+    DirectorRetrieveAPIView,
+    MovieListCreateAPIView,
+    MovieRetrieveAPIView,
+    ReviewListCreateAPIView,
+    ReviewRetrieveAPIView,
+    MovieReviewsListAPIView,
+)
 
-router = DefaultRouter()
-router.register(r'directors', DirectorViewSet)
-router.register(r'movies', MovieViewSet)
-router.register(r'reviews', ReviewViewSet)
-
-urlpatterns = router.urls
+urlpatterns = [
+    path('directors/', DirectorListCreateAPIView.as_view(), name='director-list'),
+    path('directors/<int:id>/', DirectorRetrieveAPIView.as_view(), name='director-detail'),
+    path('movies/', MovieListCreateAPIView.as_view(), name='movie-list'),
+    path('movies/<int:id>/', MovieRetrieveAPIView.as_view(), name='movie-detail'),
+    path('reviews/', ReviewListCreateAPIView.as_view(), name='review-list'),
+    path('reviews/<int:id>/', ReviewRetrieveAPIView.as_view(), name='review-detail'),
+    path('movies/reviews/', MovieReviewsListAPIView.as_view(), name='movie-reviews-list'),
+]
