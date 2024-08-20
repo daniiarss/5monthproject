@@ -1,31 +1,32 @@
 from rest_framework import serializers
 from .models import Director, Movie, Review
 
+class DirectorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Director
+        fields = '__all__'
+
+    def validate_name(self, value):
+        if len(value) < 2:
+            raise serializers.ValidationError("Name must be at least 2 characters long.")
+        return value
+
+class MovieSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Movie
+        fields = '__all__'
+
+    def validate_title(self, value):
+        if len(value) < 2:
+            raise serializers.ValidationError("Title must be at least 2 characters long.")
+        return value
+
 class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
         fields = '__all__'
 
-class MovieSerializer(serializers.ModelSerializer):
-    reviews = ReviewSerializer(many=True, read_only=True)
-    rating = serializers.SerializerMethodField()
-
-    class Meta:
-        model = Movie
-        fields = '__all__'
-
-    def get_rating(self, obj):
-        reviews = obj.review_set.all()
-        if reviews:
-            return sum(review.stars for review in reviews) / len(reviews)
-        return None
-
-class DirectorSerializer(serializers.ModelSerializer):
-    movies_count = serializers.SerializerMethodField()
-
-    class Meta:
-        model = Director
-        fields = '__all__'
-
-    def get_movies_count(self, obj):
-        return obj.movie_set.count()
+    def validate_review_text(self, value):
+        if len(value) < 10:
+            raise serializers.ValidationError("Review text must be at least 10 characters long.")
+        return value

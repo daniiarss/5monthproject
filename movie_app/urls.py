@@ -5,8 +5,7 @@ from .views import (
     MovieListCreateAPIView,
     MovieRetrieveUpdateDestroyAPIView,
     ReviewListCreateAPIView,
-    ReviewRetrieveUpdateDestroyAPIView,
-    MovieReviewsListAPIView,
+    ReviewRetrieveUpdateDestroyAPIView
 )
 
 urlpatterns = [
@@ -16,5 +15,4 @@ urlpatterns = [
     path('movies/<int:pk>/', MovieRetrieveUpdateDestroyAPIView.as_view(), name='movie-detail'),
     path('reviews/', ReviewListCreateAPIView.as_view(), name='review-list-create'),
     path('reviews/<int:pk>/', ReviewRetrieveUpdateDestroyAPIView.as_view(), name='review-detail'),
-    path('movies/reviews/', MovieReviewsListAPIView.as_view(), name='movie-reviews-list'),
 ]
