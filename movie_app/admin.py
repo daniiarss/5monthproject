@@ -1,11 +1,9 @@
-# movie_app/admin.py
-
 from django.contrib import admin
-from .models import Movie, Director, Review
+from .models import Movie, Director, Review, Code
 
 @admin.register(Movie)
 class MovieAdmin(admin.ModelAdmin):
-    list_display = ('title', 'duration', 'director')  # Убедитесь, что эти поля существуют в модели Movie
+    list_display = ('title', 'duration', 'director')
 
 @admin.register(Director)
 class DirectorAdmin(admin.ModelAdmin):
@@ -13,4 +11,8 @@ class DirectorAdmin(admin.ModelAdmin):
 
 @admin.register(Review)
 class ReviewAdmin(admin.ModelAdmin):
-    list_display = ('movie', 'stars', 'review_text')  # Убедитесь, что эти поля существуют в модели Review
+    list_display = ('movie', 'stars', 'review_text')
+
+@admin.register(Code)
+class CodeAdmin(admin.ModelAdmin):
+    list_display = ('user', 'confirmation_code', 'created_at')
