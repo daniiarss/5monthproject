@@ -1,124 +1,104 @@
-from django.contrib.auth import get_user_model
-from rest_framework import status
-from rest_framework.response import Response
-from rest_framework.views import APIView
-from rest_framework.authtoken.models import Token
-from django.core.mail import send_mail
-import random
-import string
-from django.http import HttpResponse
-from django.http import JsonResponse
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.views import View
-
+from django.shortcuts import render, redirect
+from django.urls import reverse_lazy
+from .models import Director, Movie, Review, Code
+from django.contrib.auth import get_user_model
+from django.http import HttpResponse
 User = get_user_model()
 
+
 def home(request):
-    return HttpResponse("Welcome to the Afisha API!")
+    return HttpResponse("Welcome to the Afisha home page!")
+class RegisterUserView(View):
+    def post(self, request, *args, **kwargs):
+        # Логика регистрации пользователя
+        return JsonResponse({"message": "User registered successfully"})
 
+class DirectorListView(ListView):
+    model = Director
+    template_name = 'director_list.html'
 
-class ConfirmUserView(View):
-    def post(self, request):
-        code = request.POST.get('confirmation_code')
-        if not code:
-            return JsonResponse({'error': 'Confirmation code is required.'}, status=400)
+class DirectorDetailView(DetailView):
+    model = Director
+    template_name = 'director_detail.html'
 
-        User = get_user_model()
+class DirectorCreateView(CreateView):
+    model = Director
+    fields = ['name']
+    template_name = 'director_form.html'
+    success_url = reverse_lazy('director-list-create')
+
+class DirectorUpdateView(UpdateView):
+    model = Director
+    fields = ['name']
+    template_name = 'director_form.html'
+    success_url = reverse_lazy('director-list-create')
+
+class DirectorDeleteView(DeleteView):
+    model = Director
+    template_name = 'director_confirm_delete.html'
+    success_url = reverse_lazy('director-list-create')
+
+class MovieListView(ListView):
+    model = Movie
+    template_name = 'movie_list.html'
+
+class MovieDetailView(DetailView):
+    model = Movie
+    template_name = 'movie_detail.html'
+
+class MovieCreateView(CreateView):
+    model = Movie
+    fields = ['title', 'duration', 'director']
+    template_name = 'movie_form.html'
+    success_url = reverse_lazy('movie-list-create')
+
+class MovieUpdateView(UpdateView):
+    model = Movie
+    fields = ['title', 'duration', 'director']
+    template_name = 'movie_form.html'
+    success_url = reverse_lazy('movie-list-create')
+
+class MovieDeleteView(DeleteView):
+    model = Movie
+    template_name = 'movie_confirm_delete.html'
+    success_url = reverse_lazy('movie-list-create')
+
+class ReviewListView(ListView):
+    model = Review
+    template_name = 'review_list.html'
+
+class ReviewDetailView(DetailView):
+    model = Review
+    template_name = 'review_detail.html'
+
+class ReviewCreateView(CreateView):
+    model = Review
+    fields = ['movie', 'review_text', 'stars']
+    template_name = 'review_form.html'
+    success_url = reverse_lazy('review-list-create')
+
+class ReviewUpdateView(UpdateView):
+    model = Review
+    fields = ['movie', 'review_text', 'stars']
+    template_name = 'review_form.html'
+    success_url = reverse_lazy('review-list-create')
+
+class ReviewDeleteView(DeleteView):
+    model = Review
+    template_name = 'review_confirm_delete.html'
+    success_url = reverse_lazy('review-list-create')
+
+class UserConfirmationView(View):
+    def post(self, request, *args, **kwargs):
+        code = request.POST.get('code')
         try:
-            user = User.objects.get(confirmation_code=code)
+            code_obj = Code.objects.get(code=code)
+            user = code_obj.user
             user.is_active = True
-            user.confirmation_code = ''
             user.save()
-            return JsonResponse({'message': 'User confirmed successfully.'})
-        except User.DoesNotExist:
-            return JsonResponse({'error': 'Invalid confirmation code.'}, status=400)
-
-
-class UserRegistrationView(APIView):
-    def post(self, request):
-        username = request.data.get('username')
-        password = request.data.get('password')
-        email = request.data.get('email')
-        if not (username and password and email):
-            return Response({'error': 'Username, password, and email are required.'}, status=status.HTTP_400_BAD_REQUEST)
-
-        user = User(username=username, email=email)
-        user.set_password(password)
-        user.is_active = False
-        user.save()
-
-        confirmation_code = ''.join(random.choices(string.digits, k=6))
-        user.confirmation_code = confirmation_code
-        user.save()
-
-        send_mail(
-            'Confirm your registration',
-            f'Your confirmation code is {confirmation_code}',
-            'from@example.com',
-            [email],
-            fail_silently=False,
-        )
-
-        return Response({'message': 'User registered. Please check your email to confirm your registration.'}, status=status.HTTP_201_CREATED)
-
-class UserConfirmationView(APIView):
-    def post(self, request):
-        username = request.data.get('username')
-        confirmation_code = request.data.get('confirmation_code')
-        try:
-            user = User.objects.get(username=username, confirmation_code=confirmation_code)
-            user.is_active = True
-            user.confirmation_code = ''
-            user.save()
-            return Response({'message': 'User confirmed successfully.'}, status=status.HTTP_200_OK)
-        except User.DoesNotExist:
-            return Response({'error': 'Invalid confirmation code or username.'}, status=status.HTTP_400_BAD_REQUEST)
-class DirectorListCreateAPIView(APIView):
-    def get(self, request):
-        return Response({'message': 'GET request for Directors'})
-
-    def post(self, request):
-        return Response({'message': 'POST request for Directors'})
-
-class DirectorRetrieveUpdateDestroyAPIView(APIView):
-    def get(self, request, pk):
-        return Response({'message': f'GET request for Director {pk}'})
-
-    def put(self, request, pk):
-        return Response({'message': f'PUT request for Director {pk}'})
-
-    def delete(self, request, pk):
-        return Response({'message': f'DELETE request for Director {pk}'})
-
-class MovieListCreateAPIView(APIView):
-    def get(self, request):
-        return Response({'message': 'GET request for Movies'})
-
-    def post(self, request):
-        return Response({'message': 'POST request for Movies'})
-
-class MovieRetrieveUpdateDestroyAPIView(APIView):
-    def get(self, request, pk):
-        return Response({'message': f'GET request for Movie {pk}'})
-
-    def put(self, request, pk):
-        return Response({'message': f'PUT request for Movie {pk}'})
-
-    def delete(self, request, pk):
-        return Response({'message': f'DELETE request for Movie {pk}'})
-
-class ReviewListCreateAPIView(APIView):
-    def get(self, request):
-        return Response({'message': 'GET request for Reviews'})
-
-    def post(self, request):
-        return Response({'message': 'POST request for Reviews'})
-
-class ReviewRetrieveUpdateDestroyAPIView(APIView):
-    def get(self, request, pk):
-        return Response({'message': f'GET request for Review {pk}'})
-
-    def put(self, request, pk):
-        return Response({'message': f'PUT request for Review {pk}'})
-
-    def delete(self, request, pk):
-        return Response({'message': f'DELETE request for Review {pk}'})
+            code_obj.delete()
+            return redirect('success_page')
+        except Code.DoesNotExist:
+            return render(request, 'error_page.html', {'message': 'Invalid code'})
